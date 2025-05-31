@@ -84,6 +84,8 @@ def cumulative_write():
         merged_dict = ''
         offset = offset + limit
         pull_iter += 1
+    post_process('output.json')
+    return None
          
 
 # part 5
@@ -105,7 +107,13 @@ def cumulative_write_csv():
 
         offset = offset + limit
         
-        
+def post_process(filepath):
+    with open(filepath, 'r') as file:
+        content = file.read()
+        content = content[:-1] + ']'
+    with open(filepath, 'w') as file:
+        file.write(content)
+    
 
 def read_json(filepath):
     with open(filepath) as f:
@@ -118,6 +126,6 @@ if __name__ == '__main__':
     # get_token()
     # authenticate_api()
     # query_added(2,10)
-    cumulative_write()
+    # cumulative_write()
     # cumulative_write_csv()
-    # read_json('output.json')
+    read_json('output.json')
