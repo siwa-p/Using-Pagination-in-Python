@@ -1,5 +1,6 @@
 import requests
 import json
+import pandas as pd
 import os
 # get token using user-password dictionary
 def get_token() -> dict:
@@ -55,8 +56,6 @@ def query_added(offset, limit):
 
 # part 4
 def cumulative_write():
-    max = 50
-    pull_iter = 1
     offset = 0
     limit = 10
     merged_dict = '['
@@ -83,7 +82,6 @@ def cumulative_write():
                 file.write(str(merged_dict))
         merged_dict = ''
         offset = offset + limit
-        pull_iter += 1
     post_process('output.json')
     return None
          
@@ -94,18 +92,32 @@ def cumulative_write():
 def cumulative_write_csv():
     offset = 0
     limit = 10
+    strings_to_add = "first_name, last_name, email, address \n"
     while True:
         data_queried = query_added(offset, limit)
+        
+        for data in data_queried:
+            for index, (key, value) in enumerate(data.items()):
+                if index ==len(data)-1:
+                    strings_to_add = f'{strings_to_add} "{repr(value).replace("'", "")}"'
+                else:
+                    strings_to_add = f'{strings_to_add} "{value}",'
+            strings_to_add = f"{strings_to_add} \n"
+                
+        
         if not data_queried:
             break
-        if not os.path.exists('output.csv'):
+        
+        if not os.path.exists('output.json'):
             with open('output.csv', 'w') as file:
-                json.dump(data_queried, file, indent=2)
+                file.write(str(strings_to_add))
         else:
             with open('output.csv', 'a') as file:
-                json.dump(data_queried, file, indent=2)
+                file.write(str(strings_to_add))
 
         offset = offset + limit
+        
+    return None
         
 def post_process(filepath):
     with open(filepath, 'r') as file:
@@ -120,6 +132,9 @@ def read_json(filepath):
         data = json.load(f)
         print(data)
 
+def read_csv(filepath):
+    data = pd.read_csv(filepath)
+    print(data)
 
 
 if __name__ == '__main__':
@@ -127,5 +142,6 @@ if __name__ == '__main__':
     # authenticate_api()
     # query_added(2,10)
     # cumulative_write()
-    # cumulative_write_csv()
-    read_json('output.json')
+    cumulative_write_csv()
+    # read_json('output.json')
+    # read_csv('output.csv')
