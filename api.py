@@ -114,7 +114,7 @@ def cumulative_write_csv():
         else:
             with open('output.csv', 'a') as file:
                 file.write(str(strings_to_add))
-
+        strings_to_add = ''
         offset = offset + limit
         
     return None
@@ -133,8 +133,11 @@ def read_json(filepath):
         print(data)
 
 def read_csv(filepath):
-    data = pd.read_csv(filepath)
-    print(data)
+    # data = pd.read_csv(filepath)
+    # print(data)
+    with open(filepath, 'r') as f:
+        data = f.read()
+        print(data)
 
 
 if __name__ == '__main__':
@@ -144,4 +147,4 @@ if __name__ == '__main__':
     # cumulative_write()
     cumulative_write_csv()
     # read_json('output.json')
-    # read_csv('output.csv')
+    read_csv('output.csv')
