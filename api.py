@@ -59,32 +59,37 @@ def cumulative_write():
     offset = 0
     limit = 10
     merged_dict = '['
+    
+    # 
     while True:
         data_queried = query_added(offset, limit)
         # this is a list of dictionaries
         # i need to merge into a single dictionary
         for data in data_queried:
-            merged_dict = f'{merged_dict}{{'
-            for index, (key,value) in enumerate(data.items()):
-                # prevent comma at the end
-                if index == len(data)-1:
-                    merged_dict = f'{merged_dict}"{key}":"{repr(value).replace("'", "")}"'
-                else:
-                    merged_dict = f'{merged_dict}"{key}":"{repr(value).replace("'", "")}",'
-            merged_dict = f"{merged_dict}}},"
+            merged_dict = create_string(data, merged_dict)
         if not data_queried:
             break
         if not os.path.exists('output.json'):
             with open('output.json', 'w') as file:
                 file.write(str(merged_dict))
-        else:
+        else:            
             with open('output.json', 'a') as file:
                 file.write(str(merged_dict))
         merged_dict = ''
         offset = offset + limit
     post_process('output.json')
     return None
-         
+
+
+def create_string(dict, merged_dict):
+    merged_dict = f'{merged_dict}{{'
+    for index, (key,value) in enumerate(dict.items()):
+        # prevent comma at the end
+        if index == len(dict)-1:
+            merged_dict = f'{merged_dict}"{key}":"{repr(value).replace("'", "")}"'
+        else:
+            merged_dict = f'{merged_dict}"{key}":"{repr(value).replace("'", "")}",'
+    return f"{merged_dict}}},"    
 
 # part 5
 # read into a csv
@@ -144,7 +149,7 @@ if __name__ == '__main__':
     # get_token()
     # authenticate_api()
     # query_added(2,10)
-    # cumulative_write()
-    cumulative_write_csv()
+    cumulative_write()
+    # cumulative_write_csv()
     # read_json('output.json')
-    read_csv('output.csv')
+    # read_csv('output.csv')
